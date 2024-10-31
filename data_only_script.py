@@ -2,11 +2,13 @@ import random
 import time
 import timeit
 import heapq
+from bisect import bisect
+from itertools import accumulate
+from typing import Callable
 
 Position = tuple[int, int]
 Size = tuple[int, int]
 Maze = dict[Position, Position | None]
-Path = list[Position]
 
 
 def generate_default_maze(size: Size) -> Maze:
@@ -26,10 +28,10 @@ def generate_default_maze(size: Size) -> Maze:
 	return maze
 
 
-def neighbors(maze: Maze, node: Position) -> list[Position]:
+def neighbors(node: Position, predicate: Callable[[Position], bool]=None) -> list[Position]:
 	row, col = node
-	orthogonal_nodes = (row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)
-	return [node for node in orthogonal_nodes if node in maze]
+	res = [(row-1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
+	return res if predicate is None else [n for n in res if predicate(n)]
 
 
 def print_stats(number_list, indents=0):
@@ -44,10 +46,16 @@ def print_stats(number_list, indents=0):
 	print(indentation + 'Q1     :', sorted_list[len(sorted_list) // 4])
 	print(indentation + 'Q3     :', sorted_list[len(sorted_list) * 3 // 4])
 
+def print_results(title: str, *args: tuple[str, list]):
+	print(title)
+	for label, data in args:
+		print(label)
+		print_stats(data, indents=1)
+		print()
 
 # region origin_shift
 def origin_shift(maze: Maze, origin: Position) -> Position:
-	nodes = neighbors(maze, origin)
+	nodes = neighbors(origin, lambda e: e in maze)
 	new_origin = random.choice(nodes)
 	maze[origin] = new_origin
 	maze[new_origin] = None
@@ -57,38 +65,47 @@ def origin_shift(maze: Maze, origin: Position) -> Position:
 def test_origin_shift(maze_size: Size, nb_tests: int):
 	maze = generate_default_maze(maze_size)
 	origin = maze_size[0] - 1, maze_size[1] - 1
-	durations = []
-	os_durations = []
-	nb_loops = maze_size[0] * maze_size[1] * 10
+	nb_calls: list[int] = []
+	os_durations: list[float] = []
+	durations: list[float] = []
+	threshold: int = int(maze_size[0] * maze_size[1] * 0.1)
 	for _ in range(nb_tests):
+		# test setup
+		unvisited = set(maze)
+		unvisited.discard(origin)
+		nb_calls.append(0)
 		durations.append(0)
-		for _2 in range(nb_loops):
+		# loop
+		while len(unvisited) > threshold:
+			# real test
 			start_time = time.time()
 			origin = origin_shift(maze, origin)
 			end_time = time.time()
+
+			# update test data
+			unvisited.discard(origin)
+			nb_calls[-1] += 1
 			time_taken_ms = (end_time - start_time) * 1000
 			durations[-1] += time_taken_ms
 			os_durations.append(time_taken_ms * 1000)
-	print("Maze of size", maze_size[0], "by", maze_size[1], "over", nb_tests, "iterations")
-	print("Nb Calls per maze generated:", nb_loops)
-	print()
-	print("Maze Generation Time (in ms)")
-	print_stats(durations, indents=1)
-	print()
-	print("Origin-Shift Execution Time (in ns)")
-	print_stats(os_durations, indents=1)
+	print_results(
+		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
+		("Nb Calls", nb_calls),
+		("Maze Generation Duration (in ms)", durations),
+		("Algorithm Execution Time (in ns)", os_durations)
+	)
 
 
 # endregion origin_shift
 
 
 # region solving
-def direct_pathing(maze: Maze, _from: Position, to: Position) -> Path:
+def direct_pathing(maze: Maze, _from: Position, to: Position) -> list[Position]:
 	if _from == to:
 		return []
 
-	path1: Path = []
-	path2: Path = []
+	path1: list[Position] = []
+	path2: list[Position] = []
 
 	while _from is not None:
 		path1.append(_from)
@@ -110,7 +127,7 @@ def direct_pathing(maze: Maze, _from: Position, to: Position) -> Path:
 	return path1
 
 
-def dijkstra(maze: Maze, _from: Position, to: Position) -> Path:
+def dijkstra(maze: Maze, _from: Position, to: Position) -> list[Position]:
 	# almost entirely copied pasted from
 	# https://www.askpython.com/python/examples/dijkstras-algorithm-python
 
@@ -131,7 +148,7 @@ def dijkstra(maze: Maze, _from: Position, to: Position) -> Path:
 		if current_node == to:
 			break
 		# Explore neighbors
-		for neighbor in neighbors(maze, current_node):
+		for neighbor in neighbors(current_node, lambda e: e in maze):
 			# if the path between the 2 nodes doesn't exist, ignore it
 			if maze[current_node] != neighbor and maze[neighbor] != current_node:
 				continue
@@ -162,7 +179,7 @@ def test_solving(maze_size: Size, nb_tests: int):
 	dijkstra_durations = []
 	direct_pathing_durations = []
 
-	for i in range(nb_tests):
+	for _ in range(nb_tests):
 		# change the maze with origin shift
 		for _ in range(nb_nodes * 10):
 			origin = origin_shift(maze, origin)
@@ -174,71 +191,60 @@ def test_solving(maze_size: Size, nb_tests: int):
 		# save timings
 		dijkstra_durations.append(dijkstra_duration * 1_000_000)
 		direct_pathing_durations.append(direct_duration * 1_000_000)
-
-	print("Solving maze of size", maze_size[0], "by", maze_size[1], "over", nb_tests, "iterations")
-	print("Dijkstra (ns)")
-	print_stats(dijkstra_durations, indents=1)
-	print()
-	print("Direct Pathing (ns)")
-	print_stats(direct_pathing_durations, indents=1)
-
+	print_results(
+		f"Solving maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
+		("Dijkstra (ns)", dijkstra_durations),
+		("Direct Pathing (ns)", direct_pathing_durations)
+	)
 
 # endregion solving
 
 
 # region weighted_origin_shift
 def weighted_origin_shift(maze: Maze, origin: Position, visit_count: dict[Position, int]) -> Position:
-	nodes = neighbors(maze, origin)
-	weights = [1 / (visit_count[n] + 1) for n in nodes]
-	new_origin = random.choices(nodes, weights=weights, k=1)[0]
+	nodes = neighbors(origin, lambda e: e in maze)
+	weights = [1 / visit_count[n] for n in nodes]
+	cum_weights = list(accumulate(weights))
+	new_origin = nodes[bisect(cum_weights, random.random() * cum_weights[-1], 0, len(weights))]
 	maze[origin] = new_origin
 	maze[new_origin] = None
-	visit_count[origin] += 1
+	visit_count[new_origin] += 1
 	return new_origin
 
 
 def test_weighted_origin_shift(maze_size: Size, nb_tests: int):
 	maze = generate_default_maze(maze_size)
 	origin = maze_size[0] - 1, maze_size[1] - 1
-	nb_calls_list: list[int] = []
+	threshold = int(maze_size[0] * maze_size[1] * 0.1)
+	nb_calls: list[int] = []
 	durations: list[float] = []
 	wos_durations: list[float] = []
 	for _ in range(nb_tests):
 		# test setup
-		nb_calls = 0
+		nb_calls.append(0)
 		durations.append(0)
-
-		# setup
-		visit_count: dict[Position, int] = {k: 0 for k in maze.keys()}
-		visit_count[origin] += 1
+		visit_count: dict[Position, int] = {k: 1 for k in maze.keys()}
+		visit_count[origin] = 2
 		remaining_unvisited = len(maze) - 1
-
 		# loop
-		while remaining_unvisited > 0:
+		while remaining_unvisited > threshold:
+			# real test
 			start_time = time.time()
-
 			origin = weighted_origin_shift(maze, origin, visit_count)
-			if visit_count[origin] == 1:
-				remaining_unvisited -= 1
-
 			end_time = time.time()
-
-			nb_calls += 1
+			# update test data
+			if visit_count[origin] == 2:
+				remaining_unvisited -= 1
+			nb_calls[-1] += 1
 			time_taken_ms = (end_time - start_time) * 1000
-			wos_durations.append(time_taken_ms * 1000)
 			durations[-1] += time_taken_ms
-
-		nb_calls_list.append(nb_calls)
-	print("Maze of size", maze_size[0], "by", maze_size[1], "over", nb_tests, "iterations")
-	print("Nb Calls")
-	print_stats(nb_calls_list, indents=1)
-	print()
-	print("Maze Generation Duration (in ms)")
-	print_stats(durations, indents=1)
-	print()
-	print("Algorithm Execution Time (in ns)")
-	print_stats(wos_durations, indents=1)
-
+			wos_durations.append(time_taken_ms * 1000)
+	print_results(
+		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
+		("Nb Calls", nb_calls),
+		("Maze Generation Duration (in ms)", durations),
+		("Algorithm Execution Time (in ns)", wos_durations)
+	)
 
 # endregion weighted_origin_shift
 
@@ -247,7 +253,7 @@ def test_weighted_origin_shift(maze_size: Size, nb_tests: int):
 def multi_origins_shift(maze: Maze, origins: set[Position]) -> set[Position]:
 	new_origins = set()
 	for origin in origins:
-		new_origin = random.choice(neighbors(maze, origin))
+		new_origin = random.choice(neighbors(origin, lambda e: e in maze))
 		new_origins.add(new_origin)
 		maze[origin] = new_origin
 	# separated to avoid bugs
@@ -267,8 +273,47 @@ def test_multi_origins(maze_size: Size, origins: set[Position], nb_iter: int):
 
 # endregion multi_origin_shift
 
+# region reversed_dfs
+def reversed_dfs(size: Size) -> tuple[Maze, Position]:
+	# initialize needed data
+	maze: Maze = {}
+	unvisited = set((i, j) for i in range(size[0]) for j in range(size[1]))
+	stack: list[Position] = []
+	origin = random.randrange(size[0]), random.randrange(size[1])
+
+	# update data
+	maze[origin] = None
+	stack.append(origin)
+	unvisited.discard(origin)
+	currentNode = origin
+
+	# Apply reversed DFS
+	while (stack):
+		currentNode = stack[-1]
+		ns = neighbors(currentNode, lambda e: e in unvisited)
+		# backtrack
+		if not ns:
+			stack.pop()
+			continue
+		choosen = ns[random.randrange(len(ns))]
+		stack.append(choosen)
+		unvisited.discard(choosen)
+		maze[choosen] = currentNode
+	return (maze, origin)
+
+
+def test_reversed_dfs(maze_size: Size, nb_tests: int):
+	durations = []
+	for _ in range(nb_tests):
+		start_time = time.time()
+		reversed_dfs(maze_size)
+		end_time = time.time()
+		durations.append((end_time - start_time) * 1000)
+	print_results(
+		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
+		("Maze Generation Duration (in ms)", durations)
+	)
+# endregion reversed_dfs
 
 if __name__ == '__main__':
-	test_weighted_origin_shift((16, 16), 5000)
-	test_weighted_origin_shift((32, 32), 5000)
-	test_weighted_origin_shift((64, 64), 5000)
+	test_reversed_dfs((64, 64), 5000)
