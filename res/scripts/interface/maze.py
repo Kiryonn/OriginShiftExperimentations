@@ -3,12 +3,13 @@ import networkx as nx
 import random as rd
 import tkinter as tk
 
+from interface_script import Interface
 from res.scripts.Vectors import Vector2, Vector2i
 from res.scripts.interface.maze_settings import MazeSettings
 
 
 class Maze(tk.Canvas):
-	def __init__(self, master, size: Vector2i):
+	def __init__(self, master: Interface, size: Vector2i):
 		size = Vector2i.max(Vector2i(3, 3), size)
 		super(Maze, self).__init__(master)
 		self.__graph: nx.DiGraph = nx.DiGraph()
