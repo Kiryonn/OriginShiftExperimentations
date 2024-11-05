@@ -1,17 +1,15 @@
+import math
 import os
 import tkinter as tk
 from datetime import datetime
-from typing import Callable
-
 from PIL import Image
-
 import networkx as nx
 import random as rd
-
-from Vectors import *
+from res.scripts.Vectors import Vector2, Vector2i
+from res.scripts.signals import Signal
 
 BASE_MAZE_SIZE = Vector2i(7, 7)
-
+SCREENSHOTS_PATH = "screenshots/"
 
 def spinbox_vcmd(text: str) -> bool:
 	return text.isdigit() or text == ''
@@ -84,9 +82,9 @@ class App(tk.Tk):
 				else:
 					colors[color] = 0
 				im.putpixel((x, y), color)
-		if not os.path.exists("screenshots/"):
-			os.makedirs("screenshots/")
-		filename = "screenshots/" + datetime.now().strftime("%Y_%m_%d-%H_%M_%S") + ".png"
+		if not os.path.exists(SCREENSHOTS_PATH):
+			os.makedirs(SCREENSHOTS_PATH)
+		filename = SCREENSHOTS_PATH + datetime.now().strftime("%Y_%m_%d-%H_%M_%S") + ".png"
 		im.save(filename, format="png")
 		print("image saved successfully at", os.path.abspath(filename))
 
@@ -361,12 +359,6 @@ class Maze(tk.Canvas):
 		self.redraw()
 
 	def step(self) -> None:
-		# self.unvisited_nodes = set(self.__graph.nodes)
-		# self.visit_count = {node: 0 for node in self.__graph.nodes}
-		# for origin in self.__origins:
-		# 	self.unvisited_nodes.discard(origin)
-		# 	self.visit_count[origin] += 1
-		# while self.unvisited_nodes:
 		while self.__last_created_arrows:
 			arrow = self.__last_created_arrows.pop()
 			self.__recolor_arrow(arrow, self.settings.arrow_color)
@@ -375,8 +367,7 @@ class Maze(tk.Canvas):
 			origin = self.__origins.pop()
 			directions, weigths = self.get_weigthed_directions(origin)
 			new_origin = rd.choices(directions, weights=weigths, k=1)[0]
-			# self.visit_count[new_origin] += 1
-			# self.unvisited_nodes.discard(new_origin)
+
 			self.add_edge(origin, new_origin)
 			self.remove_origin(origin)
 			new_origins.add(new_origin)
@@ -431,29 +422,6 @@ class MazeSettings:
 		self.node_spacing = 50
 		self.node_radius = 5
 		self.start_point = Vector2(20, 20)
-
-
-class Signal:
-	def __init__(self):
-		self.__funcs = set()
-
-	def add_listener(self, func: Callable):
-		self.__funcs.add(func)
-
-	def remove_listener(self, func: Callable):
-		self.__funcs.discard(func)
-
-	def emit(self, *args, **kws):
-		for func in self.__funcs:
-			func(*args, **kws)
-
-	def __iadd__(self, func: Callable):
-		self.add_listener(func)
-		return self
-
-	def __isub__(self, func: Callable):
-		self.remove_listener(func)
-		return self
 
 
 if __name__ == '__main__':

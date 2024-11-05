@@ -1,0 +1,93 @@
+Maze of size 16 by 16 over 5000 iterations
+Nb Calls
+	min    : 791
+	max    : 4970
+	average: 1732.2374
+	Q1     : 1364
+	Q3     : 1997
+
+Maze Generation Duration (in ms)
+	min    : 0.0
+	max    : 18.197059631347656
+	average: 2.1677675247192383
+	Q1     : 0.0
+	Q3     : 2.000570297241211
+
+Algorithm Execution Time (in ns)
+	min    : 0.0
+	max    : 15671.968460083008
+	average: 1.251426348789859
+	Q1     : 0.0
+	Q3     : 0.0
+
+==========================================
+
+Maze of size 32 by 32 over 5000 iterations
+Nb Calls
+	min    : 4212
+	max    : 25948
+	average: 8113.3392
+	Q1     : 6564
+	Q3     : 9170
+
+Maze Generation Duration (in ms)
+	min    : 0.0
+	max    : 34.508705139160156
+	average: 10.275253629684448
+	Q1     : 0.9601116180419922
+	Q3     : 15.627384185791016
+
+Algorithm Execution Time (in ns)
+	min    : 0.0
+	max    : 16036.9873046875
+	average: 1.2664641988201908
+	Q1     : 0.0
+	Q3     : 0.0
+
+==========================================
+
+Maze of size 64 by 64 over 5000 iterations
+Nb Calls
+	min    : 21953
+	max    : 97683
+	average: 37294.3042
+	Q1     : 31028
+	Q3     : 41746
+
+Maze Generation Duration (in ms)
+	min    : 0.0
+	max    : 130.83434104919434
+	average: 46.80322113037109
+	Q1     : 35.14242172241211
+	Q3     : 56.533098220825195
+
+Algorithm Execution Time (in ns)
+	min    : 0.0
+	max    : 16039.133071899414
+	average: 1.2549696832893613
+	Q1     : 0.0
+	Q3     : 0.0
+
+==========================================
+
+Maze of size 128 by 128 over 5000 iterations
+Nb Calls
+	min    : 103633
+	max    : 425534
+	average: 166136.3862
+	Q1     : 140920
+	Q3     : 183087
+
+Maze Generation Duration (in ms)
+	min    : 78.58538627624512
+	max    : 499.9852180480957
+	average: 209.60499200820922
+	Q1     : 173.20704460144043
+	Q3     : 236.54913902282715
+
+Algorithm Execution Time (in ns)
+	min    : 0.0
+	max    : 16038.894653320312
+	average: 1.2616441033927415
+	Q1     : 0.0
+	Q3     : 0.0

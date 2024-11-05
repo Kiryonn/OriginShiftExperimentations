@@ -16,7 +16,7 @@ class Vector2:
 	@x.setter
 	def x(self, value: float | int) -> None:
 		if not isinstance(value, float | int):
-			raise TypeError("Cannot assign " + value.__class__.__name__ + "to Vector2.x")
+			raise TypeError(f"Cannot assign {value.__class__.__name__} to Vector2.x")
 		self._x = float(value)
 
 	@property
@@ -26,7 +26,7 @@ class Vector2:
 	@y.setter
 	def y(self, value: float | int) -> None:
 		if not isinstance(value, float | int):
-			raise TypeError("Cannot assign " + value.__class__.__name__ + "to Vector2.y")
+			raise TypeError(f"Cannot assign {value.__class__.__name__} to Vector2.y")
 		self._y = float(value)
 	# endregion properties
 
@@ -111,12 +111,12 @@ class Vector2:
 
 	def __sub__(self, other: Self | 'Vector2i' | float | int) -> Self:
 		if not isinstance(other, Vector2 | Vector2i | float | int):
-			raise TypeError("Can't substract " + other.__class__.__name__ + " from a Vector2")
+			raise TypeError(f"Can't substract {other.__class__.__name__} from a Vector2")
 		return self.__add__(-other)
 
 	def __isub__(self, other: Self | 'Vector2i' | float | int) -> Self:
 		if not isinstance(other, Vector2 | Vector2i | float | int):
-			raise TypeError("Can't substract " + other.__class__.__name__ + " from a Vector2")
+			raise TypeError("Can't substract {other.__class__.__name__} from a Vector2")
 		self.__iadd__(-other)
 		return self
 
@@ -146,7 +146,7 @@ class Vector2:
 		elif isinstance(other, float | int):
 			return Vector2(self.x / other, self.y / other)
 		else:
-			raise TypeError("Can't divide Vector2 with " + other.__class__.__name__)
+			raise TypeError(f"Can't divide Vector2 with {other.__class__.__name__}")
 
 	def __itruediv__(self, other: Self | 'Vector2i' | float | int) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
@@ -154,7 +154,7 @@ class Vector2:
 		elif isinstance(other, float | int):
 			self.set(self.x / other, self.y / other)
 		else:
-			raise TypeError("Can't divide Vector2 with " + other.__class__.__name__)
+			raise TypeError(f"Can't divide Vector2 with {other.__class__.__name__}")
 		return self
 
 	def __floordiv__(self, other: Self | 'Vector2i' | float | int) -> Self:
@@ -196,7 +196,6 @@ class Vector2:
 	def __hash__(self):
 		return hash((self.x, self.y))
 	# endregion magic_methods
-	pass
 
 
 class Vector2i:
@@ -381,7 +380,7 @@ class Vector2i:
 	def __iter__(self):
 		return [self.x, self.y].__iter__()
 
-	def __getitem__(self, item: int) -> int:
+	def __getitem__(self, item: int|str) -> int:
 		if item == 'x':
 			return self.x
 		if item == 'y':
@@ -404,4 +403,3 @@ class Vector2i:
 	def __hash__(self):
 		return hash((self.x, self.y))
 	# endregion magic_methods
-	pass
