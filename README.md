@@ -11,15 +11,18 @@ You will find 2 scripts in particular that you will find useful: "interface_scri
 "interface_script.py" will let you vizualize what happens with control over the number of step, the size of the maze, the visualization of the solution, the manipulation of the start/end nodes throught left click on a node, the creation/deletion of origins through the right click on a node and the capture of the current state of your maze into an image. More QoL might be added in the future.
 
 
-## Dependencies
-To run interface_script.py, you need the following dependencies:
-- [Python 3.12 or higher](https://www.python.org/downloads/)
-- [Networkx 3.3 or higher](https://pypi.org/project/networkx/)
-- [pillow (aka PIL) 10.4.0 or higher](https://pypi.org/project/pillow/)
+## Install
+If you don't have git or python, you have to download them:
+- git: https://git-scm.com/downloads
+- python (3.10 or higher): https://www.python.org/downloads/
+You can directly install the environment using the following commands:
+- `git clone https://github.com/Kiryonn/OriginShiftExperimentations.git <your-folder-path>`
+- `cd <your-folder-path>`
+- `python -m venv .venv`
+- windows: `.\.venv\Scripts\activate`
+- linux/macos: `source .venv/bin/activate`
+- `pip install -r requirements.txt`
 
-Alternatively, if you already have python 3 installed, you just need to run `pip install networkx pillow` to install the 2 other dependencies.
-
-If it doesn't work, try using `py -m pip install networkx pillow` instead.
 
 <br>
 The data_only_script.py doesn't require any dependency other than python 3.
