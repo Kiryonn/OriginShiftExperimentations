@@ -14,7 +14,7 @@ You will find 2 scripts in particular that you will find useful: "interface_scri
 ## Install
 If you don't have git or python, you have to download them:
 - git: https://git-scm.com/downloads
-- python (3.10 or higher): https://www.python.org/downloads/
+- python (3.12 or higher): https://www.python.org/downloads/
 
 You can directly install the environment using the following commands:
 - `git clone https://github.com/Kiryonn/OriginShiftExperimentations.git <your-folder-path>`
