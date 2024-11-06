@@ -3,13 +3,14 @@ import networkx as nx
 import random as rd
 import tkinter as tk
 
-from interface_script import Interface
+if __name__ == "__main__":
+	from interface_script import Interface
 from res.scripts.Vectors import Vector2, Vector2i
 from res.scripts.interface.maze_settings import MazeSettings
 
 
 class Maze(tk.Canvas):
-	def __init__(self, master: Interface, size: Vector2i):
+	def __init__(self, master: "Interface", size: Vector2i):
 		size = Vector2i.max(Vector2i(3, 3), size)
 		super(Maze, self).__init__(master)
 		self.__graph: nx.DiGraph = nx.DiGraph()
@@ -129,7 +130,7 @@ class Maze(tk.Canvas):
 	def add_edge(self, p1: Vector2i, p2: Vector2i) -> None:
 		start: Vector2 = self.settings.start_point + p1.swap() * self.settings.node_spacing
 		end: Vector2 = self.settings.start_point + p2.swap() * self.settings.node_spacing
-		direction: Vector2 = (end - start).normalized
+		direction: Vector2 = (end - start).normalized()
 		offset: Vector2 = direction * self.settings.node_radius
 		start += offset
 		end -= offset

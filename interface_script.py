@@ -1,22 +1,26 @@
+# builtin imports
 from datetime import datetime
 import os
 import tkinter as tk
 
+# dependencies imports
 from PIL import Image
 
+# code base imports
 from res.scripts.Vectors import Vector2i
 from res.scripts.interface.constants import BASE_MAZE_SIZE, SCREENSHOTS_PATH
 from res.scripts.interface.control_pannel import ControlPanel
 from res.scripts.interface.maze import Maze
+
 
 class Interface(tk.Tk):
 	def __init__(self):
 		super(Interface, self).__init__()
 
 		self.maze = Maze(self, BASE_MAZE_SIZE)
-		self.control_pannel = ControlPanel(self)
+		self.control_panel = ControlPanel(self)
 
-		self.control_pannel.place(x=0, y=0, relwidth=1, height=50)
+		self.control_panel.place(x=0, y=0, relwidth=1, height=50)
 		self.maze.place(x=0, y=50, relwidth=1, relheight=1)
 
 		self.config(width=512, height=512)
@@ -24,10 +28,10 @@ class Interface(tk.Tk):
 		self.bind("<Button-1>", self.focus_fix)
 		self.last_focused = self
 
-		self.control_pannel.on_path_toggled += self.on_solution_button_clicked
-		self.control_pannel.on_step_clicked += self.on_step_button_clicked
-		self.control_pannel.on_maze_size_changed += self.on_maze_size_changed
-		self.control_pannel.on_save_image_button_pressed += self.make_maze_screenshot
+		self.control_panel.on_path_toggled += self.on_solution_button_clicked
+		self.control_panel.on_step_clicked += self.on_step_button_clicked
+		self.control_panel.on_maze_size_changed += self.on_maze_size_changed
+		self.control_panel.on_save_image_button_pressed += self.make_maze_screenshot
 
 	def focus_fix(self, _event) -> None:
 		x, y = self.winfo_pointerxy()
@@ -57,8 +61,9 @@ class Interface(tk.Tk):
 	def on_maze_size_changed(self, size: Vector2i) -> None:
 		self.maze.resize(size)
 
-	def get_color(self, color) -> tuple[int, ...]:
-		return tuple(c // 256 for c in self.winfo_rgb(color))
+	def get_color(self, color) -> tuple[int, int, int]:
+		r, g, b = self.winfo_rgb(color)
+		return r // 256, g // 256, b // 256
 
 	def make_maze_screenshot(self):
 		area = self.maze.get_area()

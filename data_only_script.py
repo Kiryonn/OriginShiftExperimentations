@@ -10,6 +10,11 @@ Position = tuple[int, int]
 Size = tuple[int, int]
 Maze = dict[Position, Position | None]
 
+units = ["s", "ms", "μs", "ns"]
+generation_message = "Maze Generation Duration (in {unit})"
+class Results:
+	def __init__(self):
+		pass
 
 def generate_default_maze(size: Size) -> Maze:
 	rows, cols = size
@@ -91,8 +96,8 @@ def test_origin_shift(maze_size: Size, nb_tests: int):
 	print_results(
 		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
 		("Nb Calls", nb_calls),
-		("Maze Generation Duration (in ms)", durations),
-		("Algorithm Execution Time (in ns)", os_durations)
+		(generation_message.format(unit='ms'), durations),
+		("Algorithm Execution Time (in µs)", os_durations)
 	)
 
 
@@ -193,8 +198,8 @@ def test_solving(maze_size: Size, nb_tests: int):
 		direct_pathing_durations.append(direct_duration * 1_000_000)
 	print_results(
 		f"Solving maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
-		("Dijkstra (ns)", dijkstra_durations),
-		("Direct Pathing (ns)", direct_pathing_durations)
+		("Dijkstra (µs)", dijkstra_durations),
+		("Direct Pathing (µs)", direct_pathing_durations)
 	)
 
 # endregion solving
@@ -203,9 +208,8 @@ def test_solving(maze_size: Size, nb_tests: int):
 # region weighted_origin_shift
 def weighted_origin_shift(maze: Maze, origin: Position, visit_count: dict[Position, int]) -> Position:
 	nodes = neighbors(origin, lambda e: e in maze)
-	weights = [1 / visit_count[n] for n in nodes]
-	cum_weights = list(accumulate(weights))
-	new_origin = nodes[bisect(cum_weights, random.random() * cum_weights[-1], 0, len(weights))]
+	cum_weights = list(accumulate(1 / visit_count[n] for n in nodes))
+	new_origin = nodes[bisect(cum_weights, random.random() * cum_weights[-1], 0, len(nodes))]
 	maze[origin] = new_origin
 	maze[new_origin] = None
 	visit_count[new_origin] += 1
@@ -242,10 +246,9 @@ def test_weighted_origin_shift(maze_size: Size, nb_tests: int):
 	print_results(
 		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
 		("Nb Calls", nb_calls),
-		("Maze Generation Duration (in ms)", durations),
+		(generation_message.format(unit='ms'), durations),
 		("Algorithm Execution Time (in ns)", wos_durations)
 	)
-
 # endregion weighted_origin_shift
 
 
@@ -269,9 +272,8 @@ def test_multi_origins(maze_size: Size, origins: set[Position], nb_iter: int):
 		origins = multi_origins_shift(maze, origins)
 		origins_translations.append(origins)
 	print(origins_translations)
-
-
 # endregion multi_origin_shift
+
 
 # region reversed_dfs
 def reversed_dfs(size: Size) -> tuple[Maze, Position]:
@@ -285,35 +287,51 @@ def reversed_dfs(size: Size) -> tuple[Maze, Position]:
 	maze[origin] = None
 	stack.append(origin)
 	unvisited.discard(origin)
-	currentNode = origin
 
 	# Apply reversed DFS
-	while (stack):
-		currentNode = stack[-1]
-		ns = neighbors(currentNode, lambda e: e in unvisited)
+	while stack:
+		current_node = stack[-1]
+		ns = neighbors(current_node, lambda e: e in unvisited)
 		# backtrack
 		if not ns:
 			stack.pop()
 			continue
-		choosen = ns[random.randrange(len(ns))]
-		stack.append(choosen)
-		unvisited.discard(choosen)
-		maze[choosen] = currentNode
-	return (maze, origin)
+		chosen = ns[random.randrange(len(ns))]
+		stack.append(chosen)
+		unvisited.discard(chosen)
+		maze[chosen] = current_node
+	return maze, origin
 
 
 def test_reversed_dfs(maze_size: Size, nb_tests: int):
-	durations = []
-	for _ in range(nb_tests):
-		start_time = time.time()
-		reversed_dfs(maze_size)
-		end_time = time.time()
-		durations.append((end_time - start_time) * 1000)
+	durations = timeit.repeat(f"{reversed_dfs.__name__}({maze_size})", globals=globals(),number=nb_tests, repeat=1)
 	print_results(
 		f"Maze of size {maze_size[0]} by {maze_size[1]} over {nb_tests} iterations",
-		("Maze Generation Duration (in ms)", durations)
+		(generation_message.format(unit='ms'), durations)
 	)
 # endregion reversed_dfs
 
+def main():
+	test_results = {}
+	maze_sizes_to_test = [(16, 16), (32, 32), (64, 64)]
+	nb_iterations = 5000
+	generation_algorithms = [reversed_dfs]
+	for size in maze_sizes_to_test:
+		test_results[size] = {}
+		section_name = f"{generation_algorithms=}".rstrip("=")
+		if len(generation_algorithms) > 0:
+			test_results[size][section_name] = {}
+		for algorithm in generation_algorithms:
+			stmt = f"{algorithm.__name__}({size})"
+			timings = timeit.repeat(stmt, globals=globals(), number=1, repeat=nb_iterations)
+			test_results[size][section_name][algorithm.__name__] = timings
+		#
+		# row_format = "{:>15}" * (len(test_results[size]) + 1)
+		# print(row_format.format("", *test_results[size]))
+		# #
+		# for section, row in zip(test_results[size], test_results[size]):
+		# 	print(row_format.format(team, *row))
+
+
 if __name__ == '__main__':
-	test_reversed_dfs((64, 64), 5000)
+	main()
