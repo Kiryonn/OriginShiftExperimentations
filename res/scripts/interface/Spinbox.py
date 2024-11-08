@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Any
 
-from res.scripts.utils import isint, isfloat
+from res.scripts.interface.utils import isint, isfloat
 
 
 class Spinbox(tk.Spinbox):

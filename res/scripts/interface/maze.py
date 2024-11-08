@@ -4,7 +4,7 @@ import random as rd
 import tkinter as tk
 
 if __name__ == "__main__":
-	from interface_script import Interface
+	from interface import Interface
 from res.scripts.Vectors import Vector2, Vector2i
 from res.scripts.interface.maze_settings import MazeSettings
 

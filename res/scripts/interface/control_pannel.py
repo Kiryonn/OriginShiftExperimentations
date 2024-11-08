@@ -4,7 +4,7 @@ from res.scripts.interface.Spinbox import Spinbox
 
 # avoid circular dependencies
 if __name__ == "__main__":
-	from interface_script import Interface
+	from interface import Interface
 
 from res.scripts.Vectors import Vector2i
 from res.scripts.interface.constants import BASE_MAZE_SIZE
