@@ -32,3 +32,6 @@ You can get help by writting `python data_only.py --help`
 ### <i>interface.pyw</i>
 
 You can just double-click on it. It should open.
+commands:
+- left-click on a node: select start/end points of the maze
+- right-click: add/remove origin (the removing process is still a bit bugged but it'll fix itself eventally by running the algorithm)
