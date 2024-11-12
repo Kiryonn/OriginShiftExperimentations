@@ -2,33 +2,32 @@
 This project provides scripts for experimenting with the Origin-Shift Algorithm for maze generation.
 I used it in order to make some experimentations on the Origin Shift Algorithm created by [CaptainLuma](https://github.com/CaptainLuma/).
 
-
-## Scripts
 You will find 2 scripts in particular that you will find useful: "interface_script.py" and "data_only_script.py".
 
-"data_only.py" will let you manipulate a maze through the given functions. You will find an example in it to show how you can use the functions in order to manipulate the maze.
+`data_only.py` is a command prompt script and `insterface.pyw` is a GUI tool.
 
-"interface_script.py" will let you vizualize what happens with control over the number of step, the size of the maze, the visualization of the solution, the manipulation of the start/end nodes throught left click on a node, the creation/deletion of origins through the right click on a node and the capture of the current state of your maze into an image. More QoL might be added in the future.
+The interface is still a WIP so there might be bugs. Note that it will be completely revamped for better ease of use and
+flexibility of testing in the future.
 
+## Installation Guide
 
-## Install
-If you don't have git or python, you have to download them:
-- git: https://git-scm.com/downloads
-- python (3.12 or higher): https://www.python.org/downloads/
+- download and install [python](https://www.python.org/downloads/) 3.12 or higher
+- during the installation of python
+- download the project zip file by clicking on the green button at the top of the github page
+- unzip the files
+- open a terminal
+- make sure you are within the same folder as "requirements.txt" (you can change it using `cd`)
+- run `python -m pip install -r requirements.txt`
 
-You can directly install the environment using the following commands:
-- `git clone https://github.com/Kiryonn/OriginShiftExperimentations.git <your-folder-path>`
-- `cd <your-folder-path>`
-- `python -m venv .venv`
-- windows: `.\.venv\Scripts\activate`
-- linux/macos: `source .venv/bin/activate`
-- `pip install -r requirements.txt`
+## Usage Guide
 
+### <i style='color:green'>data_only.py</i>
 
-<br>
-The data_only_script.py doesn't require any dependency other than python 3.
+- open a terminal
+- Run `python data_only.py [commands]`<br>
 
-You will also need an IDE such as Visual Studio Code, Pycharm Community, or any other that you like to manipulate those files.
+You can get help by writting `python data_only.py --help`
 
-## Additional work
-If you want to create scripts based on my work, please fork the project, or mention this repository in the README.md file of your own github repository.
+### <i style='color:green'>interface.pyw</i>
+
+You can just double-click on it. It should open.
