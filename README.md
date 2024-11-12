@@ -12,7 +12,7 @@ flexibility of testing in the future.
 ## Installation Guide
 
 - download and install [python](https://www.python.org/downloads/) 3.12 or higher
-- during the installation of python
+- during the installation of python, make sure to select the "add to PATH" option
 - download the project zip file by clicking on the green button at the top of the github page
 ![image](https://github.com/user-attachments/assets/2fab4d7a-b8b1-44cb-8a70-5581ad73bbf6)
 - unzip the files
