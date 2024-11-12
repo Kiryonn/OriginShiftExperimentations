@@ -19,17 +19,29 @@ def neighbors(node: Position, predicate: Callable[[Position], bool] = None) -> l
 	return res if predicate is None else [n for n in res if predicate(n)]
 
 
+def get_stats(number_list: list) -> dict[str, float|int]:
+	if not number_list:
+		return {k:float("nan") for k in ["min", "max", "mean", "q1", "q3"]}
+	sorted_list = sorted(number_list)
+	cumulated_sum = sum(sorted_list)
+	return {
+		"min": sorted_list[0],
+		"max": sorted_list[-1],
+		"mean": cumulated_sum / len(sorted_list),
+		"q1": sorted_list[len(sorted_list) // 4],
+		"q3": sorted_list[len(sorted_list) * 3 // 4]
+	}
+
 def print_stats(number_list, indents=0):
 	if not number_list:
 		return
-	sorted_list = sorted(number_list)
-	cumulated_sum = sum(sorted_list)
+	stats = get_stats(number_list)
 	indentation = '\t' * indents
-	print(indentation + 'min    :', sorted_list[0])
-	print(indentation + 'max    :', sorted_list[-1])
-	print(indentation + 'average:', cumulated_sum / len(sorted_list))
-	print(indentation + 'Q1     :', sorted_list[len(sorted_list) // 4])
-	print(indentation + 'Q3     :', sorted_list[len(sorted_list) * 3 // 4])
+	print(indentation + "min  :", stats["min"])
+	print(indentation + "max  :", stats["max"])
+	print(indentation + "Mean :", stats["mean"])
+	print(indentation + "Q1   :", stats["q1"])
+	print(indentation + "Q3   :", stats["q3"])
 
 
 def maze_to_string(maze: Maze, size: Size) -> str:

@@ -1,45 +1,53 @@
-from _typeshed import SupportsWrite
-from typing import Callable, Literal
+import json
+import os
+import sys
+
+from res.scripts.data_only.tests import generations_tests
 
 
-class Bcolors:
-	BLUE = '\033[94m'
-	BOLD = '\033[1m'
-	CYAN = '\033[96m'
-	END = '\033[0m'
-	FAIL = '\033[91m'
-	GREEN = '\033[92m'
-	HEADER = '\033[95m'
-	UNDERLINE = '\033[4m'
-	WARNING = '\033[93m'
-
-def print_err(*values: str, sep=' ', end='\n', file: SupportsWrite[str] | None = None, flush: Literal[False] = False):
-	print('\033[91m', end='', file=file)
-	print(*values, sep=sep, end='', file=file)
-	print('\033[0m', end=end)
+def print_progression(progression: float):
+	percent = progression * 100
+	num_blocks = int(percent * 0.5)
+	sys.stdout.write(f"\rProgress: [{"#" * num_blocks}{" " * (50 - num_blocks)}] {percent:.1f}%")
+	sys.stdout.flush()
 
 
-def print_help():
-	pass
+def start_test(show_res: bool = False, output: str = None, *args, **kws):
+	# this section only prevent users from waiting results just to get a file error at the end
+	if output is not None:
+		folder = os.path.dirname(output)
+		if folder != '': os.makedirs(folder, exist_ok=True)
+		open(output, "w", encoding="utf-8").close()
+
+	# start tests
+	generations_tests.on_progression_changed += print_progression
+	results = generations_tests.start(*args, **kws)
+	generations_tests.on_progression_changed -= print_progression
+	print('\n') # put some space after progression bar
 
 
-def print_results():
-	pass
+	if show_res:
+		generations_tests.result_printer(results)
+
+	if output is not None:
+		folder = os.path.dirname(output)
+		if folder != '': os.makedirs(folder, exist_ok=True)
+		with open(output, "w", encoding="utf-8") as file: json.dump(results, file, indent='\t')
+		print(f"\nSaved results to file at {os.path.abspath(output)}")
 
 
-def start_test(test_name: str, nb_ars):
-	pass
+def main():
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-s", "--size", nargs=2, type=int, help="the size of the maze")
+	parser.add_argument("-i", "--iter", default=1000, type=int, help="the number of iterations")
+	parser.add_argument("-r", "--show_res", action="store_true", help="shows a summary of the results")
+	parser.add_argument('-o', '--output', default=None, help="saves the results in a specified file")
+	namespace = parser.parse_args()
+	args = [namespace.show_res, namespace.output]
+	kws = {"size": tuple(namespace.size), "nb_iterations": namespace.iter}
+	start_test(*args, **kws)
 
 
-def __detect_cmd(input_str: str) -> tuple[Callable, list] | None:
-	pass
-
-
-if __name__ == '__main__':
-	is_running = True
-	print("type help() to get help")
-	while is_running:
-		cmd = __detect_cmd(input())
-		if cmd is None:
-			print_err("")
-			continue
+if __name__ == "__main__":
+	main()

@@ -1,17 +1,18 @@
-from typing import Callable
+from typing import Callable, Set
 
 
 class Signal:
 	def __init__(self):
-		self.__funcs = set()
+		self.__funcs: Set[Callable] = set()
 
-	def add_listener(self, func: Callable):
+	def add_listener(self, func: Callable) -> None:
+
 		self.__funcs.add(func)
 
-	def remove_listener(self, func: Callable):
+	def remove_listener(self, func: Callable) -> None:
 		self.__funcs.discard(func)
 
-	def emit(self, *args, **kws):
+	def emit(self, *args, **kws) -> None:
 		for func in self.__funcs:
 			func(*args, **kws)
 
