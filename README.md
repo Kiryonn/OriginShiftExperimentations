@@ -18,7 +18,8 @@ flexibility of testing in the future.
 - unzip the files
 - open a terminal
 - make sure you are within the same folder as "requirements.txt"
-  - (you can change it using the command `cd [relative_or_absolute_path]`)
+  - you can change it using the command `cd <path>`
+  - if it doesn't work, try using `cd "<path>"` instead
 - run `python -m pip install -r requirements.txt`
 
 ## Usage Guide
