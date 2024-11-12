@@ -17,7 +17,7 @@ flexibility of testing in the future.
 ![image](https://github.com/user-attachments/assets/2fab4d7a-b8b1-44cb-8a70-5581ad73bbf6)
 - unzip the files
 - open a terminal
-- make sure you are within the same folder as "requirements.txt" (you can change it using `cd`)
+- make sure you are within the same folder as "requirements.txt" (you can change it using `cd [relative_or_absolute_path]`)
 - run `python -m pip install -r requirements.txt`
 
 ## Usage Guide
