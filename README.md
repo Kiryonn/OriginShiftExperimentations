@@ -14,6 +14,7 @@ flexibility of testing in the future.
 - download and install [python](https://www.python.org/downloads/) 3.12 or higher
 - during the installation of python
 - download the project zip file by clicking on the green button at the top of the github page
+![image](https://github.com/user-attachments/assets/2fab4d7a-b8b1-44cb-8a70-5581ad73bbf6)
 - unzip the files
 - open a terminal
 - make sure you are within the same folder as "requirements.txt" (you can change it using `cd`)
@@ -21,13 +22,13 @@ flexibility of testing in the future.
 
 ## Usage Guide
 
-### <i style='color:green'>data_only.py</i>
+### <i>data_only.py</i>
 
 - open a terminal
-- Run `python data_only.py [commands]`<br>
+- run `python data_only.py [commands]`
 
 You can get help by writting `python data_only.py --help`
 
-### <i style='color:green'>interface.pyw</i>
+### <i>interface.pyw</i>
 
 You can just double-click on it. It should open.
