@@ -25,7 +25,6 @@ def start_test(show_res: bool = False, output: str = None, *args, **kws):
 	generations_tests.on_progression_changed -= print_progression
 	print('\n') # put some space after progression bar
 
-
 	if show_res:
 		generations_tests.result_printer(results)
 

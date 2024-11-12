@@ -21,6 +21,7 @@ def count_calls(func: Callable):
 on_progression_changed = Signal()
 
 
+# noinspection SpellCheckingInspection
 def result_printer(results: dict[str, dict[str, list]]):
 	headers = ["Evaluation"]
 	headers.extend(results["timings"].keys())
@@ -77,10 +78,10 @@ def start(size: tuple[int, int] = (16, 16), nb_iterations=1000):
 
 	res = {
 		"timings": {
-			"Reversed DFS": [0] * nb_iterations,
-			"Origin Shift": [0] * nb_iterations,
-			"Weighted Origin Shift": [0] * nb_iterations,
-			"Multi Origin Shift (incomplete)": [0] * nb_iterations
+			"Reversed DFS": [0.0] * nb_iterations,
+			"Origin Shift": [0.0] * nb_iterations,
+			"Weighted Origin Shift": [0.0] * nb_iterations,
+			"Multi Origin Shift (incomplete)": [0.0] * nb_iterations
 		},
 		"nb calls": {
 			"Origin Shift": [0] * nb_iterations,
