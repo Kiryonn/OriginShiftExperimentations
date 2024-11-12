@@ -128,6 +128,8 @@ class Maze(tk.Canvas):
 			self.add_origin(o)
 
 	def change_solution_node(self, position: Vector2i) -> None:
+		if position in self.__solution_extremities:
+			return
 		# recolor old start
 		old_start = self.__solution_extremities[0]
 		if self.__graph.has_node(old_start):
