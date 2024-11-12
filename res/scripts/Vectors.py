@@ -1,5 +1,6 @@
+from __future__ import annotations
 import math
-from typing import Self
+from typing import Self, Iterator
 
 
 class Vector2:
@@ -73,13 +74,13 @@ class Vector2:
 
 	# region static_methods
 	@staticmethod
-	def max(v1: Self | 'Vector2i', v2: Self | 'Vector2i') -> Self:
+	def max(v1: Vector2 | Vector2i, v2: Vector2 | Vector2i) -> Vector2:
 		if not (isinstance(v1, Vector2 | Vector2i) and isinstance(v2, Vector2 | Vector2i)):
 			raise TypeError
 		return Vector2(max(v1.x, v2.x), max(v1.y, v2.y))
 
 	@staticmethod
-	def min(v1: Self | 'Vector2i', v2: Self | 'Vector2i') -> Self:
+	def min(v1: Vector2 | Vector2i, v2: Vector2 | Vector2i) -> Vector2:
 		if not (isinstance(v1, Vector2 | Vector2i) and isinstance(v2, Vector2 | Vector2i)):
 			raise TypeError
 		return Vector2(min(v1.x, v2.x), min(v1.y, v2.y))
@@ -89,7 +90,7 @@ class Vector2:
 	def __neg__(self) -> Self:
 		return Vector2(-self.x, -self.y)
 
-	def __add__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __add__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			return Vector2(self.x + other.x, self.y + other.y)
 		elif isinstance(other, float | int):
@@ -97,10 +98,10 @@ class Vector2:
 		else:
 			raise TypeError("Can't add Vector2 and " + other.__class__.__name__)
 
-	def __radd__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __radd__(self, other) -> Self:
 		return self.__add__(other)
 
-	def __iadd__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __iadd__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			self.set(self.x + other.x, self.y + other.y)
 		elif isinstance(other, float | int):
@@ -109,18 +110,18 @@ class Vector2:
 			raise TypeError("Can't add Vector2 and " + other.__class__.__name__)
 		return self
 
-	def __sub__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __sub__(self, other) -> Self:
 		if not isinstance(other, Vector2 | Vector2i | float | int):
 			raise TypeError(f"Can't substract {other.__class__.__name__} from a Vector2")
 		return self.__add__(-other)
 
-	def __isub__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __isub__(self, other) -> Self:
 		if not isinstance(other, Vector2 | Vector2i | float | int):
 			raise TypeError("Can't substract {other.__class__.__name__} from a Vector2")
 		self.__iadd__(-other)
 		return self
 
-	def __mul__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __mul__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			return Vector2(self.x * other.x, self.y * other.y)
 		elif isinstance(other, float | int):
@@ -128,10 +129,10 @@ class Vector2:
 		else:
 			raise TypeError("Can't multiply Vector2 and " + other.__class__.__name__)
 
-	def __rmul__(self, other: Self | float | int) -> Self:
+	def __rmul__(self, other) -> Self:
 		return self.__mul__(other)
 
-	def __imul__(self, other: Self | float | int) -> Self:
+	def __imul__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			self.set(self.x * other.x, self.y * other.y)
 		elif isinstance(other, float | int):
@@ -140,7 +141,7 @@ class Vector2:
 			raise TypeError("Can't multiply Vector2 and " + other.__class__.__name__)
 		return self
 
-	def __truediv__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __truediv__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			return Vector2(self.x / other.x, self.y / other.y)
 		elif isinstance(other, float | int):
@@ -148,7 +149,7 @@ class Vector2:
 		else:
 			raise TypeError(f"Can't divide Vector2 with {other.__class__.__name__}")
 
-	def __itruediv__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __itruediv__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			self.set(self.x / other.x, self.y / other.y)
 		elif isinstance(other, float | int):
@@ -157,7 +158,7 @@ class Vector2:
 			raise TypeError(f"Can't divide Vector2 with {other.__class__.__name__}")
 		return self
 
-	def __floordiv__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __floordiv__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			return Vector2(self.x // other.x, self.y // other.y)
 		elif isinstance(other, float | int):
@@ -165,7 +166,7 @@ class Vector2:
 		else:
 			raise TypeError("Can't divide Vector2 with " + other.__class__.__name__)
 
-	def __ifloordiv__(self, other: Self | 'Vector2i' | float | int) -> Self:
+	def __ifloordiv__(self, other) -> Self:
 		if isinstance(other, Vector2 | Vector2i):
 			self.set(self.x // other.x, self.y // other.y)
 		elif isinstance(other, float | int):
@@ -174,8 +175,8 @@ class Vector2:
 			raise TypeError("Can't divide Vector2 with " + other.__class__.__name__)
 		return self
 
-	def __iter__(self):
-		return [self.x, self.y].__iter__()
+	def __iter__(self) -> Iterator[float]:
+		return (self.x, self.y).__iter__()
 
 	def __getitem__(self, item: int) -> float:
 		if not isinstance(item, int):
@@ -270,7 +271,7 @@ class Vector2i:
 
 	# region static_methods
 	@staticmethod
-	def max(v1, v2):
+	def max(v1: Vector2i | Vector2, v2: Vector2i | Vector2) -> Vector2i:
 		"""
 		Calculate the max x and max y of both vectors and return them in a Vector2i
 		:type v1: Vector2i | Vector2
@@ -283,7 +284,7 @@ class Vector2i:
 		return Vector2i(max(v1.x, v2.x), max(v1.y, v2.y))
 
 	@staticmethod
-	def min(v1, v2):
+	def min(v1: Vector2i | Vector2, v2: Vector2i | Vector2) -> Vector2i:
 		"""
 		Calculate the min x and min y of both vectors and return them in a :class:`Vector2i`
 		:type v1: Vector2i | Vector2
@@ -302,7 +303,7 @@ class Vector2i:
 	def __neg__(self) -> Self:
 		return Vector2i(-self.x, -self.y)
 
-	def __add__(self, other: Self | Vector2 | float | int) -> Self:
+	def __add__(self, other) -> Self:
 		if isinstance(other, Vector2i | Vector2):
 			return Vector2i(self.x + other.x, self.y + other.y)
 		elif isinstance(other, float | int):
@@ -310,10 +311,10 @@ class Vector2i:
 		else:
 			raise TypeError("Can't add Vector2i and " + other.__class__.__name__)
 
-	def __radd__(self, other: Self | Vector2 | float | int) -> Self:
+	def __radd__(self, other) -> Self:
 		return self.__add__(other)
 
-	def __iadd__(self, other: Self | Vector2 | float | int) -> Self:
+	def __iadd__(self, other) -> Self:
 		if isinstance(other, Vector2i | Vector2):
 			self.set(self.x + other.x, self.y + other.y)
 		elif isinstance(other, float | int):
@@ -322,18 +323,18 @@ class Vector2i:
 			raise TypeError("Can't add Vector2i and " + other.__class__.__name__)
 		return self
 
-	def __sub__(self, other: Self | Vector2 | float | int) -> Self:
+	def __sub__(self, other) -> Self:
 		if not isinstance(other, Vector2i | Vector2 | float | int):
 			raise TypeError("Can't substract " + other.__class__.__name__ + " from a Vector2i")
 		return self.__add__(-other)
 
-	def __isub__(self, other: Self | Vector2 | float | int) -> Self:
+	def __isub__(self, other) -> Self:
 		if not isinstance(other, Vector2i | Vector2 | float | int):
 			raise TypeError("Can't substract " + other.__class__.__name__ + " from a Vector2i")
 		self.__iadd__(-other)
 		return self
 
-	def __mul__(self, other: Self | Vector2 | float | int) -> Self:
+	def __mul__(self, other) -> Self:
 		if isinstance(other, Vector2i | Vector2):
 			return Vector2i(self.x * other.x, self.y * other.y)
 		elif isinstance(other, float | int):
@@ -341,10 +342,10 @@ class Vector2i:
 		else:
 			raise TypeError("Can't multiply Vector2i and " + other.__class__.__name__)
 
-	def __rmul__(self, other: Self | Vector2 | float | int) -> Self:
+	def __rmul__(self, other) -> Self:
 		return self.__mul__(other)
 
-	def __imul__(self, other: Self | Vector2 | float | int) -> Self:
+	def __imul__(self, other) -> Self:
 		if isinstance(other, Vector2i | Vector2):
 			self.set(self.x * other.x, self.y * other.y)
 		elif isinstance(other, float | int):
@@ -353,7 +354,7 @@ class Vector2i:
 			raise TypeError("Can't multiply Vector2i and " + other.__class__.__name__)
 		return self
 
-	def __truediv__(self, other: Self | Vector2 | float | int) -> Self:
+	def __truediv__(self, other) -> Self:
 		if isinstance(other, Vector2i | Vector2):
 			return Vector2i(self.x // other.x, self.y // other.y)
 		elif isinstance(other, float | int):
@@ -361,7 +362,7 @@ class Vector2i:
 		else:
 			raise TypeError("Can't divide Vector2i with " + other.__class__.__name__)
 
-	def __itruediv__(self, other: Self | Vector2 | float | int) -> Self:
+	def __itruediv__(self, other) -> Self:
 		if isinstance(other, Vector2):
 			self.set(self.x / other.x, self.y / other.y)
 		elif isinstance(other, float | int):
@@ -370,17 +371,17 @@ class Vector2i:
 			raise TypeError("Can't divide Vector2i with " + other.__class__.__name__)
 		return self
 
-	def __floordiv__(self, other: Self | Vector2 | float | int) -> Self:
+	def __floordiv__(self, other) -> Self:
 		return self.__truediv__(other)
 
-	def __ifloordiv__(self, other: Self | Vector2 | float | int) -> Self:
+	def __ifloordiv__(self, other) -> Self:
 		self.__itruediv__(other)
 		return self
 
-	def __iter__(self):
+	def __iter__(self) -> Iterator[int]:
 		return [self.x, self.y].__iter__()
 
-	def __getitem__(self, item: int|str) -> int:
+	def __getitem__(self, item: int | str) -> int:
 		if item == 'x':
 			return self.x
 		if item == 'y':

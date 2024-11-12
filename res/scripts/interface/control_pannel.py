@@ -1,18 +1,18 @@
+from __future__ import annotations
 import tkinter as tk
 
 from res.scripts.interface.Spinbox import Spinbox
 
-# avoid circular dependencies
-if __name__ == "__main__":
-	from interface import Interface
 
+if __name__ == "__main__":
+	from res.scripts.interface.interface import Interface
 from res.scripts.Vectors import Vector2i
 from res.scripts.interface.constants import BASE_MAZE_SIZE
 from res.scripts.signals import Signal
 
 
 class ControlPanel(tk.Frame):
-	def __init__(self, master: "Interface"):
+	def __init__(self, master: Interface):
 		super(ControlPanel, self).__init__(master)
 		self.last_maze_size: Vector2i = BASE_MAZE_SIZE
 

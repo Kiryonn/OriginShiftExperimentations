@@ -1,16 +1,20 @@
+from __future__ import annotations
 import math
+from bisect import bisect
+from itertools import accumulate
+
 import networkx as nx
 import random as rd
 import tkinter as tk
 
 if __name__ == "__main__":
-	from interface import Interface
+	from res.scripts.interface.interface import Interface
 from res.scripts.Vectors import Vector2, Vector2i
 from res.scripts.interface.maze_settings import MazeSettings
 
 
 class Maze(tk.Canvas):
-	def __init__(self, master: "Interface", size: Vector2i):
+	def __init__(self, master: Interface, size: Vector2i):
 		size = Vector2i.max(Vector2i(3, 3), size)
 		super(Maze, self).__init__(master)
 		self.__graph: nx.DiGraph = nx.DiGraph()
@@ -112,7 +116,14 @@ class Maze(tk.Canvas):
 	def toggle_origin(self, o: Vector2i) -> None:
 		if o in self.__origins:
 			self.remove_origin(o)
-			self.add_edge(o, rd.choice(self.adjacent_nodes(o)))
+			choices = self.adjacent_nodes(o)
+			for choice in choices:
+				if not self.__graph.has_edge(choice, o):
+					self.add_edge(o, choice)
+					return
+			choice = choices[rd.randrange(len(choices))]
+			self.remove_edge(choice, o)
+			self.add_edge(o, choice)
 		else:
 			self.add_origin(o)
 
@@ -135,7 +146,9 @@ class Maze(tk.Canvas):
 		start += offset
 		end -= offset
 
-		arrow = self.create_line(*start, *end, arrow=tk.LAST, fill=self.settings.arrow_just_created_color)
+		x1, y1 = start
+		x2, y2 = end
+		arrow = self.create_line(x1, y1, x2, y2, arrow=tk.LAST, fill=self.settings.arrow_just_created_color)
 		self.__graph.add_edge(p1, p2, gfarrow=arrow)
 		self.__last_created_arrows.append(arrow)
 
@@ -152,7 +165,9 @@ class Maze(tk.Canvas):
 		end = middle + radius_vector
 		color = self.settings.path_nodes_color if position in self.__solution_extremities else self.settings.node_color
 
-		node = self.create_oval(*start, *end, fill=color, outline='')
+		x1, y1 = start
+		x2, y2 = end
+		node = self.create_oval(x1, y1, x2, y2, fill=color, outline='')
 		self.tag_bind(node, '<Button-3>', lambda e, p=position: self.toggle_origin(p))
 		self.tag_bind(node, '<Button-1>', lambda e, p=position: self.change_solution_node(p))
 		self.__graph.add_node(position, gfnode=node)
@@ -181,19 +196,15 @@ class Maze(tk.Canvas):
 		new_origins: set[Vector2i] = set()
 		while self.__origins:
 			origin = self.__origins.pop()
-			directions, weigths = self.get_weigthed_directions(origin)
-			new_origin = rd.choices(directions, weights=weigths, k=1)[0]
+			directions: list[Vector2i] = self.adjacent_nodes(origin)
+			cum_weights = list(accumulate(1 / (self.visit_count[n] + 1) for n in directions))
+			new_origin = directions[bisect(cum_weights, rd.random() * cum_weights[-1], 0, len(cum_weights))]
 
 			self.add_edge(origin, new_origin)
 			self.remove_origin(origin)
 			new_origins.add(new_origin)
 		for new_origin in new_origins:
 			self.add_origin(new_origin)
-
-	def get_weigthed_directions(self, position: Vector2i):
-		directions: list[Vector2i] = self.adjacent_nodes(position)
-		weigths = [1 / (self.visit_count[n] + 1) for n in directions]
-		return directions, weigths
 
 	def adjacent_nodes(self, node: Vector2i) -> list[Vector2i]:
 		res: list[Vector2i] = []
