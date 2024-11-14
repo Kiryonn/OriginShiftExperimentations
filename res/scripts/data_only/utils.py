@@ -1,4 +1,5 @@
-from typing import Callable
+from functools import cache
+
 from res.scripts.data_only.constants import Size, Position, Maze
 
 
@@ -12,11 +13,9 @@ def generate_default_maze(size: Size) -> tuple[Maze, Position]:
 	maze[maxrow, maxcol] = None
 	return maze, (maxrow, maxcol)
 
-
-def neighbors(node: Position, predicate: Callable[[Position], bool] = None) -> list[Position]:
-	row, col = node
-	res = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
-	return res if predicate is None else [n for n in res if predicate(n)]
+@cache
+def neighbors(node: Position) -> list[Position]:
+	return [(node[0] - 1, node[1]), (node[0] + 1, node[1]), (node[0], node[1] - 1), (node[0], node[1] + 1)]
 
 
 def get_stats(number_list: list) -> dict[str, float|int]:

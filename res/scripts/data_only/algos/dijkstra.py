@@ -25,7 +25,7 @@ def dijkstra(maze: Maze, _from: Position, to: Position) -> list[Position]:
 		if current_node == to:
 			break
 		# Explore neighbors
-		for neighbor in neighbors(current_node, lambda e: e in maze):
+		for neighbor in [n for n in neighbors(current_node) if n in maze]:
 			# if the path between the 2 nodes doesn't exist, ignore it
 			if maze[current_node] != neighbor and maze[neighbor] != current_node:
 				continue

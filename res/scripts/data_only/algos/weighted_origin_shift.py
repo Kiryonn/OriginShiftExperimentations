@@ -7,7 +7,7 @@ from res.scripts.data_only.utils import generate_default_maze, neighbors
 
 
 def weighted_origin_shift(maze: Maze, origin: Position, visit_count: dict[Position, int]) -> Position:
-	nodes = neighbors(origin, lambda e: e in maze)
+	nodes = [n for n in neighbors(origin) if n in maze]
 	cum_weights = list(accumulate(1 / visit_count[n] for n in nodes))
 	new_origin = nodes[bisect(cum_weights, random.random() * cum_weights[-1], 0, len(nodes))]
 	maze[origin] = new_origin

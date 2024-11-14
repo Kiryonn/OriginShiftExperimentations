@@ -20,7 +20,7 @@ def reversed_dfs(size: Size) -> tuple[Maze, Position]:
 	# Apply reversed DFS
 	while stack:
 		current_node = stack[-1]
-		ns = neighbors(current_node, lambda e: e in unvisited)
+		ns = [n for n in neighbors(origin) if n in maze]
 		# backtrack
 		if not ns:
 			stack.pop()

@@ -5,7 +5,7 @@ from res.scripts.data_only.utils import generate_default_maze, neighbors
 
 
 def origin_shift(maze: Maze, origin: Position) -> Position:
-	nodes = neighbors(origin, lambda e: e in maze)
+	nodes = [n for n in neighbors(origin) if n in maze]
 	new_origin = random.choice(nodes)
 	maze[origin] = new_origin
 	maze[new_origin] = None
