@@ -1,10 +1,12 @@
 import timeit
+import inspect
 from typing import Callable
 
-from res.scripts.data_only.algos.multi_origin_shift import multi_origins_shift, generation_mos
-from res.scripts.data_only.algos.origin_shift import origin_shift, generation_os
+from res.scripts.data_only.algos.multi_origin_shift import generation_mos
+from res.scripts.data_only.algos.multi_weighted_origin_shift import generation_mwos
+from res.scripts.data_only.algos.origin_shift import generation_os
 from res.scripts.data_only.algos.reversed_dfs import reversed_dfs
-from res.scripts.data_only.algos.weighted_origin_shift import weighted_origin_shift, generation_wos
+from res.scripts.data_only.algos.weighted_origin_shift import generation_wos
 from res.scripts.data_only.utils import units, get_stats, neighbors
 from res.scripts.signals import Signal
 
@@ -66,40 +68,40 @@ def result_printer(results: dict[str, dict[str, list]]):
 
 # noinspection SpellCheckingInspection
 def start(size: tuple[int, int] = (16, 16), nb_iterations=1000):
-	print(f"Testing 3 generation algorithms on a {size[0]}x{size[1]} maze over {nb_iterations} iterations...")
-	ccos = count_calls(origin_shift)
-	ccwos = count_calls(weighted_origin_shift)
-	ccmos = count_calls(multi_origins_shift)
+	gen_funcs: dict[str, Callable] = {
+		"Reversed DFS": reversed_dfs,
+		"Origin Shift": generation_os,
+		"Weighted Origin Shift": generation_wos,
+		"Multi Origin Shift": generation_mos,
+		"Multi Weighted Origin Shift": generation_mwos
+	}
 
-	grdfs = lambda: reversed_dfs(size)
-	gos = lambda: generation_os(size, algo=ccos)
-	gwos = lambda: generation_wos(size, algo=ccwos)
-	gmos = lambda: generation_mos(size, algo=ccmos)
+	print(f"Testing {len(gen_funcs)} generation algorithms on a {size[0]}x{size[1]} maze over {nb_iterations} iterations...\n")
+	sub_funcs: dict[str, count_calls] = {}
+	test_funcs: dict[str, Callable] = {}
+	for k in gen_funcs:
+		p = inspect.signature(gen_funcs[k]).parameters
+		if "algo" in p:
+			subalgo = count_calls(p["algo"].default)
+			sub_funcs[k] = subalgo
+			test_funcs[k] = lambda g=gen_funcs[k],a=subalgo: g(size, algo=a)
+		else:
+			test_funcs[k] = lambda g=gen_funcs[k]: g(size)
 
 	res = {
-		"timings": {
-			"Reversed DFS": [0.0] * nb_iterations,
-			"Origin Shift": [0.0] * nb_iterations,
-			"Weighted Origin Shift": [0.0] * nb_iterations
-		},
-		"nb calls": {
-			"Origin Shift": [0] * nb_iterations,
-			"Weighted Origin Shift": [0] * nb_iterations
-		}
+		"timings": { k: [0.0] * nb_iterations for k in gen_funcs },
+		"nb calls": { k: [0] * nb_iterations for k in sub_funcs }
 	}
 
 	for i in range(nb_iterations):
 		on_progression_changed.emit(progression=i / nb_iterations)
-		ccos.nb_calls = 0
-		ccwos.nb_calls = 0
-		ccmos.nb_calls = 0
-		res["timings"]["Reversed DFS"][i] = timeit.timeit(grdfs, globals=locals(), number=1)
-		neighbors.cache_clear()
-		res["timings"]["Origin Shift"][i] = timeit.timeit(gos, globals=locals(), number=1)
-		neighbors.cache_clear()
-		res["timings"]["Weighted Origin Shift"][i] = timeit.timeit(gwos, globals=locals(), number=1)
-		neighbors.cache_clear()
-		res["nb calls"]["Origin Shift"][i] = ccos.nb_calls
-		res["nb calls"]["Weighted Origin Shift"][i] = ccwos.nb_calls
+
+		for k in sub_funcs:
+			sub_funcs[k].nb_calls = 0
+		for k in test_funcs:
+			res["timings"][k][i] = timeit.timeit(test_funcs[k], globals=locals(), number=1)
+			neighbors.cache_clear()
+			if k in sub_funcs:
+				res["nb calls"][k][i] = sub_funcs[k].nb_calls
 	on_progression_changed.emit(progression=1)
 	return res
