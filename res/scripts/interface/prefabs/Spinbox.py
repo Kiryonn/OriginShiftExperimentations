@@ -1,7 +1,7 @@
 import tkinter as tk
 from typing import Any
 
-from res.scripts.interface.utils import isint, isfloat
+from ...generic.utils import isint, isfloat
 
 
 class Spinbox(tk.Spinbox):
@@ -24,9 +24,6 @@ class Spinbox(tk.Spinbox):
 			self.__set(value)
 		if isinstance(value, str) and (isint(value) or isfloat(value)):
 			self.__set(float(value))
-
-	def get(self) -> str:
-		return super().get()
 
 	def __set(self, value):
 		self.delete(0, "end")

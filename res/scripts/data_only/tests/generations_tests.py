@@ -8,7 +8,7 @@ from res.scripts.data_only.algos.origin_shift import generation_os
 from res.scripts.data_only.algos.reversed_dfs import reversed_dfs
 from res.scripts.data_only.algos.weighted_origin_shift import generation_wos
 from res.scripts.data_only.utils import units, get_stats, neighbors
-from res.scripts.signals import Signal
+from res.scripts.generic.signals import Signal
 
 
 def count_calls(func: Callable):
